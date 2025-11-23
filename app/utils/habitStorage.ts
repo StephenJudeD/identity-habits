@@ -143,3 +143,104 @@ export const getWeeklyProgress = (
 
   return completedCount;
 };
+
+// Streak tracking
+export const getCurrentStreak = (
+  habitId: string,
+  weeklyGoal: number,
+  allCompletions: { [date: string]: DailyCompletion }
+): number => {
+  let streak = 0;
+  const today = new Date();
+
+  // Go backwards week by week from current week
+  for (let weekOffset = 0; weekOffset < 100; weekOffset++) {
+    const weekStart = new Date(today);
+    const dayOfWeek = weekStart.getDay();
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    weekStart.setDate(weekStart.getDate() + mondayOffset - (weekOffset * 7));
+
+    const weekDates: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + i);
+      weekDates.push(formatDate(date));
+    }
+
+    let weekCompletions = 0;
+    weekDates.forEach(date => {
+      if (getHabitCompletionForDate(habitId, date, allCompletions)) {
+        weekCompletions++;
+      }
+    });
+
+    // If this week met the goal, increment streak
+    if (weekCompletions >= weeklyGoal) {
+      streak++;
+    } else {
+      // For the current week (weekOffset === 0), allow partial progress
+      if (weekOffset === 0) {
+        // Current week - don't break streak yet
+        continue;
+      } else {
+        // Past week that didn't meet goal - break the streak
+        break;
+      }
+    }
+  }
+
+  return streak;
+};
+
+export const getLongestStreak = (
+  habitId: string,
+  weeklyGoal: number,
+  allCompletions: { [date: string]: DailyCompletion }
+): number => {
+  let longestStreak = 0;
+  let currentStreak = 0;
+  const today = new Date();
+
+  // Check all historical weeks (up to 2 years)
+  for (let weekOffset = 0; weekOffset < 104; weekOffset++) {
+    const weekStart = new Date(today);
+    const dayOfWeek = weekStart.getDay();
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    weekStart.setDate(weekStart.getDate() + mondayOffset - (weekOffset * 7));
+
+    const weekDates: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + i);
+      weekDates.push(formatDate(date));
+    }
+
+    let weekCompletions = 0;
+    weekDates.forEach(date => {
+      if (getHabitCompletionForDate(habitId, date, allCompletions)) {
+        weekCompletions++;
+      }
+    });
+
+    if (weekCompletions >= weeklyGoal) {
+      currentStreak++;
+      longestStreak = Math.max(longestStreak, currentStreak);
+    } else {
+      currentStreak = 0;
+    }
+  }
+
+  return longestStreak;
+};
+
+export const getProgressColor = (completed: number, goal: number): string => {
+  const percentage = goal > 0 ? (completed / goal) * 100 : 0;
+
+  if (completed >= goal) {
+    return '#4CAF50'; // Green - goal met
+  } else if (percentage >= 50) {
+    return '#FF9800'; // Orange - on track
+  } else {
+    return '#F44336'; // Red - behind
+  }
+};

@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  ScrollView,
 } from 'react-native';
 import HabitsGrid from '../components/HabitsGrid';
 import AddHabitModal from '../components/AddHabitModal';
+import WeekSummary from '../components/WeekSummary';
 import {
   Habit,
   DailyCompletion,
@@ -122,14 +124,18 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      <HabitsGrid
-        habits={habits}
-        allCompletions={allCompletions}
-        weekDates={weekDates}
-        onToggleCompletion={handleToggleCompletion}
-        onEditHabit={handleEditHabit}
-        onDeleteHabit={handleDeleteHabit}
-      />
+      <ScrollView style={styles.content}>
+        <WeekSummary habits={habits} allCompletions={allCompletions} />
+
+        <HabitsGrid
+          habits={habits}
+          allCompletions={allCompletions}
+          weekDates={weekDates}
+          onToggleCompletion={handleToggleCompletion}
+          onEditHabit={handleEditHabit}
+          onDeleteHabit={handleDeleteHabit}
+        />
+      </ScrollView>
 
       <AddHabitModal
         visible={modalVisible}
@@ -157,6 +163,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+  },
+  content: {
+    flex: 1,
   },
   title: {
     fontSize: 28,

@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
   Alert,
 } from 'react-native';
 import {
@@ -13,6 +12,8 @@ import {
   getWeeklyProgress,
   getHabitCompletionForDate,
   formatDate,
+  getCurrentStreak,
+  getProgressColor,
 } from '../utils/habitStorage';
 
 interface HabitsGridProps {
@@ -78,7 +79,7 @@ const HabitsGrid: React.FC<HabitsGridProps> = ({
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {/* Header Row */}
       <View style={styles.headerRow}>
         <Text style={styles.habitHeader}>HABIT</Text>
@@ -94,58 +95,86 @@ const HabitsGrid: React.FC<HabitsGridProps> = ({
       {habits.map(habit => {
         const weeklyProgress = getWeeklyProgress(habit.id, allCompletions);
         const today = formatDate(new Date());
+        const currentStreak = getCurrentStreak(habit.id, habit.weeklyGoal, allCompletions);
+        const progressColor = getProgressColor(weeklyProgress, habit.weeklyGoal);
+        const progressPercentage = habit.weeklyGoal > 0
+          ? (weeklyProgress / habit.weeklyGoal) * 100
+          : 0;
 
         return (
-          <TouchableOpacity
-            key={habit.id}
-            onLongPress={() => handleLongPress(habit)}
-            activeOpacity={0.7}
-          >
-            <View style={styles.habitRow}>
-              <Text style={styles.habitName} numberOfLines={1}>
-                {habit.name}
-              </Text>
-
-              {weekDates.map((date, index) => {
-                const isCompleted = getHabitCompletionForDate(
-                  habit.id,
-                  date,
-                  allCompletions
-                );
-                const isToday = date === today;
-
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.dayCell,
-                      isCompleted && styles.completedCell,
-                      isToday && styles.todayCell,
-                    ]}
-                    onPress={() => onToggleCompletion(habit.id, date)}
-                  >
-                    <Text
-                      style={[
-                        styles.cellText,
-                        isCompleted && styles.completedText,
-                      ]}
-                    >
-                      {isCompleted ? '✓' : 'O'}
+          <View key={habit.id} style={styles.habitContainer}>
+            <TouchableOpacity
+              onLongPress={() => handleLongPress(habit)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.habitRow}>
+                <View style={styles.habitNameContainer}>
+                  <Text style={styles.habitName} numberOfLines={1}>
+                    {habit.name}
+                  </Text>
+                  {currentStreak > 0 && (
+                    <Text style={styles.streakText}>
+                      🔥 {currentStreak}
                     </Text>
-                  </TouchableOpacity>
-                );
-              })}
+                  )}
+                </View>
 
-              <View style={styles.goalCell}>
-                <Text style={styles.goalText}>
-                  {weeklyProgress}/{habit.weeklyGoal}
-                </Text>
+                {weekDates.map((date, index) => {
+                  const isCompleted = getHabitCompletionForDate(
+                    habit.id,
+                    date,
+                    allCompletions
+                  );
+                  const isToday = date === today;
+
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.dayCell,
+                        isCompleted && styles.completedCell,
+                        isToday && styles.todayCell,
+                      ]}
+                      onPress={() => onToggleCompletion(habit.id, date)}
+                    >
+                      <Text
+                        style={[
+                          styles.cellText,
+                          isCompleted && styles.completedText,
+                        ]}
+                      >
+                        {isCompleted ? '✓' : 'O'}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+
+                <View style={styles.goalCell}>
+                  <Text style={[styles.goalText, { color: progressColor }]}>
+                    {weeklyProgress}/{habit.weeklyGoal}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+
+            {/* Progress Bar */}
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    {
+                      width: `${Math.min(progressPercentage, 100)}%`,
+                      backgroundColor: progressColor,
+                    },
+                  ]}
+                />
               </View>
             </View>
-          </TouchableOpacity>
+          </View>
         );
       })}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -199,19 +228,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
+  habitContainer: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
   habitRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
   },
-  habitName: {
+  habitNameContainer: {
     width: 100,
     paddingLeft: 12,
+    justifyContent: 'center',
+  },
+  habitName: {
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
+  },
+  streakText: {
+    fontSize: 11,
+    color: '#FF6B35',
+    fontWeight: 'bold',
+    marginTop: 2,
   },
   dayCell: {
     width: 36,
@@ -245,6 +285,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#333',
+  },
+  progressBarContainer: {
+    paddingHorizontal: 12,
+    paddingBottom: 8,
+  },
+  progressBarBackground: {
+    height: 6,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 3,
+    minWidth: 2,
   },
 });
 
