@@ -6,11 +6,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  ScrollView,
 } from 'react-native';
-import HabitsGrid from '../components/HabitsGrid';
+import TodayHabitsList from '../components/TodayHabitsList';
 import AddHabitModal from '../components/AddHabitModal';
-import WeekSummary from '../components/WeekSummary';
 import {
   Habit,
   DailyCompletion,
@@ -19,7 +17,6 @@ import {
   loadDailyCompletions,
   toggleHabitCompletion,
   deleteHabit as deleteHabitFromStorage,
-  getWeekDates,
 } from '../utils/habitStorage';
 
 export default function HomeScreen() {
@@ -27,14 +24,12 @@ export default function HomeScreen() {
   const [allCompletions, setAllCompletions] = useState<{
     [date: string]: DailyCompletion;
   }>({});
-  const [weekDates, setWeekDates] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
   // Load data on mount
   useEffect(() => {
     loadData();
-    setWeekDates(getWeekDates());
   }, []);
 
   const loadData = async () => {
@@ -115,27 +110,22 @@ export default function HomeScreen() {
 
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Identity Habits</Text>
+          <Text style={styles.title}>Today</Text>
           <Text style={styles.subtitle}>{getTodayDate()}</Text>
         </View>
 
         <TouchableOpacity style={styles.addButton} onPress={handleAddHabit}>
-          <Text style={styles.addButtonText}>+ Add Habit</Text>
+          <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
-        <WeekSummary habits={habits} allCompletions={allCompletions} />
-
-        <HabitsGrid
-          habits={habits}
-          allCompletions={allCompletions}
-          weekDates={weekDates}
-          onToggleCompletion={handleToggleCompletion}
-          onEditHabit={handleEditHabit}
-          onDeleteHabit={handleDeleteHabit}
-        />
-      </ScrollView>
+      <TodayHabitsList
+        habits={habits}
+        allCompletions={allCompletions}
+        onToggleCompletion={handleToggleCompletion}
+        onEditHabit={handleEditHabit}
+        onDeleteHabit={handleDeleteHabit}
+      />
 
       <AddHabitModal
         visible={modalVisible}
@@ -153,39 +143,41 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fafafa',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 16,
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  content: {
-    flex: 1,
+    borderBottomColor: '#e5e5e5',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#888',
     marginTop: 4,
+    fontWeight: '500',
   },
   addButton: {
+    width: 44,
+    height: 44,
     backgroundColor: '#2196F3',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 28,
+    fontWeight: '300',
   },
 });

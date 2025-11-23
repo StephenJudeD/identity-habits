@@ -70,9 +70,9 @@ const HabitsGrid: React.FC<HabitsGridProps> = ({
   if (habits.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No habits yet!</Text>
+        <Text style={styles.emptyText}>No habits tracked yet</Text>
         <Text style={styles.emptySubtext}>
-          Tap the &ldquo;+ Add Habit&rdquo; button to get started
+          Switch to Today tab to add habits
         </Text>
       </View>
     );
@@ -114,7 +114,7 @@ const HabitsGrid: React.FC<HabitsGridProps> = ({
                   </Text>
                   {currentStreak > 0 && (
                     <Text style={styles.streakText}>
-                      🔥 {currentStreak}
+                      {currentStreak} week streak
                     </Text>
                   )}
                 </View>
