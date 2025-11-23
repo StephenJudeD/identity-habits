@@ -5,33 +5,13 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#2196F3',
-        tabBarInactiveTintColor: '#999',
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: '#e5e5e5',
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-        },
+        tabBarStyle: { display: 'none' },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Today',
-          tabBarIcon: () => null,
-        }}
-      />
-      <Tabs.Screen
-        name="progress"
-        options={{
-          title: 'Progress',
-          tabBarIcon: () => null,
+          title: 'Home',
         }}
       />
     </Tabs>

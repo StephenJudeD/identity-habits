@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  ScrollView,
 } from 'react-native';
-import TodayHabitsList from '../components/TodayHabitsList';
+import HabitsGrid from '../components/HabitsGrid';
 import AddHabitModal from '../components/AddHabitModal';
 import {
   Habit,
@@ -17,6 +18,7 @@ import {
   loadDailyCompletions,
   toggleHabitCompletion,
   deleteHabit as deleteHabitFromStorage,
+  getWeekDates,
 } from '../utils/habitStorage';
 
 export default function HomeScreen() {
@@ -24,12 +26,14 @@ export default function HomeScreen() {
   const [allCompletions, setAllCompletions] = useState<{
     [date: string]: DailyCompletion;
   }>({});
+  const [weekDates, setWeekDates] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
   // Load data on mount
   useEffect(() => {
     loadData();
+    setWeekDates(getWeekDates());
   }, []);
 
   const loadData = async () => {
@@ -110,7 +114,7 @@ export default function HomeScreen() {
 
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Today</Text>
+          <Text style={styles.title}>Identity Habits</Text>
           <Text style={styles.subtitle}>{getTodayDate()}</Text>
         </View>
 
@@ -119,13 +123,16 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      <TodayHabitsList
-        habits={habits}
-        allCompletions={allCompletions}
-        onToggleCompletion={handleToggleCompletion}
-        onEditHabit={handleEditHabit}
-        onDeleteHabit={handleDeleteHabit}
-      />
+      <ScrollView style={styles.content}>
+        <HabitsGrid
+          habits={habits}
+          allCompletions={allCompletions}
+          weekDates={weekDates}
+          onToggleCompletion={handleToggleCompletion}
+          onEditHabit={handleEditHabit}
+          onDeleteHabit={handleDeleteHabit}
+        />
+      </ScrollView>
 
       <AddHabitModal
         visible={modalVisible}
@@ -143,41 +150,41 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    borderBottomColor: '#e0e0e0',
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '600',
     color: '#1a1a1a',
-    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 4,
-    fontWeight: '500',
+    fontSize: 13,
+    color: '#666',
+    marginTop: 2,
+  },
+  content: {
+    flex: 1,
   },
   addButton: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     backgroundColor: '#2196F3',
-    borderRadius: 22,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
   addButtonText: {
     color: '#fff',
-    fontSize: 28,
-    fontWeight: '300',
+    fontSize: 24,
+    fontWeight: '400',
   },
 });

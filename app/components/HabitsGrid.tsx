@@ -70,9 +70,9 @@ const HabitsGrid: React.FC<HabitsGridProps> = ({
   if (habits.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No habits tracked yet</Text>
+        <Text style={styles.emptyText}>No habits yet</Text>
         <Text style={styles.emptySubtext}>
-          Switch to Today tab to add habits
+          Tap + to create your first habit
         </Text>
       </View>
     );
